@@ -13,6 +13,41 @@ malware_average = ['nan' , 0.51031, 1487796144.1214, 10.34509, 0.643943333333333
 
 phishing_average = [0.6568973315241972, 0.36680235187697874, 0.8693803708729082, 0.8502939846223428, 0.870737222976029, 0.13251922207146088, 1.0639529624604251, 1.250927182270466, 0.3316146540027137, 0.8142921754862054, 0.8641338760741746, 0.8375395748530077, 0.5933966530981456, 0.9234735413839892, 0.8818634102216192, 0.40425146992311173, 0.8178199909543193, 0.8526458616010855, 0.11569425599276345, 0.8810492989597467, 0.9569425599276346, 0.8066938037087291, 0.9084577114427861, 0.5306196291270918, 0.6885572139303483, 1.287290818634102, 0.25816372682044325, 0.86078697421981, 1.34400723654455, 0.8597919493441881]
 
+#Features for models:
+features_svm = [
+    'having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol',
+    'double_slash_redirecting', 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State',
+    'Domain_registeration_length', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor',
+    'Links_in_tags', 'SFH', 'Submitting_to_email', 'Abnormal_URL', 'Redirect',
+    'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain',
+    'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page',
+    'Statistical_report'
+]
+
+# Since features are shared across models, these lists will be the same
+features_nn = features_svm
+features_xgboost_phishing = features_svm
+
+
+features_lightgbm, features_xgboost = [
+    'sha256',
+    'is_malware',
+    'rl_fs_t',
+    'rl_ls_const_positives',
+    'adware',
+    'flooder',
+    'ransomware',
+    'dropper',
+    'spyware',
+    'packed',
+    'crypto_miner',
+    'file_infector',
+    'installer',
+    'worm',
+    'downloader'
+]
+
+
 
 # Preloaded models
 lstm_intrusion_model = load_model('lstm_intrusion_detection.h5')
@@ -166,7 +201,8 @@ def main():
         prediction = aggregate_predictions(predictions_alohadl, predictions_lightgbm, predictions_xgboost)  # Define aggregation logic
 
     elif domain == "phishing":
-        preprocessed_input_svm = preprocess_for_svm(user_input, scaler_svm, label_encoder_svm, features_svm)
+        # Assuming that preprocess_for_svm function is adjusted to not require label_encoder_svm
+        preprocessed_input_svm = preprocess_for_svm(user_input, scaler_svm, features_svm)
         preprocessed_input_nn = preprocess_for_nn(user_input, scaler_nn, features_nn)
         preprocessed_input_xgboost_phishing = preprocess_for_xgboost_phishing(user_input, scaler_xgboost_phishing, features_xgboost_phishing)
         predictions_svm = svm_phishing_model.predict(preprocessed_input_svm)
