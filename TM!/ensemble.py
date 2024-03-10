@@ -29,7 +29,7 @@ features_nn = features_svm
 features_xgboost_phishing = features_svm
 
 
-features_lightgbm, features_xgboost = [
+features_lightgbm = [
     'sha256',
     'is_malware',
     'rl_fs_t',
@@ -46,18 +46,18 @@ features_lightgbm, features_xgboost = [
     'worm',
     'downloader'
 ]
-
+features_xgboost = features_lightgbm
 
 
 # Preloaded models
-lstm_intrusion_model = load_model('lstm_intrusion_detection.h5')
-catboost_intrusion_model = joblib.load('catboost_intrusion_detection.pkl')
-alohadl_malware_model = torch.load('alohadl_malware_detection.pth')
-xgboost_malware_model = joblib.load('xgboost_malware_detection.pkl')
-lightgmb_malware_model = joblib.load('lightgmb_malware_detection.pkl')
-nn_phishing_model = load_model('nn_phishing_detection.h5')
-svm_phishing_model = joblib.load('svm_phishing_detection.pkl')
-xgboost_phishing_model = joblib.load('xgboost_phishing_detection.pkl')
+lstm_intrusion_model = load_model('int/lstm_intrusion_detection.h5')
+catboost_intrusion_model = joblib.load('int/catboost_intrusion_detection.pkl')
+alohadl_malware_model = torch.load('mal/alohadl_malware_detection.pth')
+xgboost_malware_model = joblib.load('mal/xgboost_malware_detection.pkl')
+lightgmb_malware_model = joblib.load('mal/lightgmb_malware_detection.pkl')
+nn_phishing_model = load_model('phish/nn_phishing_detection.h5')
+svm_phishing_model = joblib.load('phish/svm_phishing_detection.pkl')
+xgboost_phishing_model = joblib.load('phish/xgboost_phishing_detection.pkl')
 
 
 scaler_intrusion = StandardScaler()
@@ -201,14 +201,14 @@ def main():
         prediction = aggregate_predictions(predictions_alohadl, predictions_lightgbm, predictions_xgboost)  # Define aggregation logic
 
     elif domain == "phishing":
-        # Assuming that preprocess_for_svm function is adjusted to not require label_encoder_svm
         preprocessed_input_svm = preprocess_for_svm(user_input, scaler_svm, features_svm)
         preprocessed_input_nn = preprocess_for_nn(user_input, scaler_nn, features_nn)
         preprocessed_input_xgboost_phishing = preprocess_for_xgboost_phishing(user_input, scaler_xgboost_phishing, features_xgboost_phishing)
         predictions_svm = svm_phishing_model.predict(preprocessed_input_svm)
         predictions_nn = nn_phishing_model.predict(preprocessed_input_nn)
         predictions_xgboost_phishing = xgboost_phishing_model.predict(preprocessed_input_xgboost_phishing)
-        prediction = aggregate_predictions(predictions_svm, predictions_nn, predictions_xgboost_phishing)  # Define aggregation logic
+        prediction = aggregate_predictions(predictions_svm, predictions_nn, predictions_xgboost_phishing)
+
 
     else:
         raise ValueError("Unknown domain")
